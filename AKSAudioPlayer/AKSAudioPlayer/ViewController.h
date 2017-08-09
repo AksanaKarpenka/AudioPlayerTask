@@ -8,9 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
+#import "AKSAudioPlayerModel.h"
 
 @interface ViewController : UIViewController
 
+@property (nonatomic, strong, readonly) AVAudioPlayer *audioPlayer;
+@property (nonatomic, strong, readonly) NSTimer *timer;
+@property (nonatomic, strong) AKSAudioPlayerModel *model;
 @property (weak, nonatomic) IBOutlet UITableView *musicSongsTable;
 @property (weak, nonatomic) IBOutlet UILabel *durationLabel;
 @property (weak, nonatomic) IBOutlet UILabel *timePassedLabel;

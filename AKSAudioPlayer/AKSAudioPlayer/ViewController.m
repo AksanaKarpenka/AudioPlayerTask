@@ -7,30 +7,27 @@
 //
 
 #import "ViewController.h"
-#import <AVFoundation/AVFoundation.h>
 
 @interface ViewController ()<UITableViewDelegate, UITableViewDataSource, AVAudioPlayerDelegate>
 
-@property (nonatomic, strong) AVAudioPlayer *audioPlayer;
-@property (nonatomic, copy) NSArray *songsList;
-@property (nonatomic, strong) NSTimer *timer;
+@property (nonatomic, strong, readwrite) AVAudioPlayer *audioPlayer;
+@property (nonatomic, strong, readwrite) NSTimer *timer;
 
 @end
 
 @implementation ViewController
 
-static NSInteger currentSongIndex;
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.songsList = [[NSBundle mainBundle] URLsForResourcesWithExtension:@"mp3" subdirectory:nil];
+    self.model = [[AKSAudioPlayerModel alloc] init];
+
+    [self.model setProperties];
     
-    currentSongIndex = 0;
-    
-    [self configAudioPlayer:currentSongIndex];
+    [self configAudioPlayer:[AKSAudioPlayerModel currentSongIndex]];
     
     [self showCurrentlySelectedSongName];
+    self.musicSongsTable.backgroundColor = [UIColor colorWithRed:(67 / 255.0) green:(94 /255.0) blue:(135 / 255.0) alpha:1.0];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -38,12 +35,11 @@ static NSInteger currentSongIndex;
 }
 
 - (void)showCurrentlySelectedSongName {
-    NSString *filename = [self.songsList[currentSongIndex] lastPathComponent];
-    self.currentMusicSongLabel.text = [filename substringToIndex:[filename length] - 4];
+    self.currentMusicSongLabel.text = [self.model songName];
 }
 
-- (void)prepareSongPlaying {
-    [self configAudioPlayer:currentSongIndex];
+- (void)startPlayingSong {
+    [self configAudioPlayer:[AKSAudioPlayerModel currentSongIndex]];
     [self.audioPlayer play];
     
     self.timer = [NSTimer scheduledTimerWithTimeInterval:0.1
@@ -60,20 +56,13 @@ static NSInteger currentSongIndex;
     [self showCurrentlySelectedSongName];
 }
 
-- (NSString *)formattedTimeForValue:(NSTimeInterval)timeInterval {
-    float minutes = floor(timeInterval / 60);
-    float seconds = floor(timeInterval) - minutes * 60;
-    
-    return [NSString stringWithFormat:@"%02.f:%02.f", minutes, seconds];
-}
-
 
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.timer invalidate];
-    currentSongIndex = indexPath.row;
-    [self prepareSongPlaying];
+    [AKSAudioPlayerModel setCurrentSongIndex:indexPath.row];
+    [self startPlayingSong];
 }
 
 
@@ -84,7 +73,7 @@ static NSInteger currentSongIndex;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [self.songsList count];
+    return [[self.model songsList] count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -92,15 +81,15 @@ static NSInteger currentSongIndex;
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     
-    NSString *filename = [self.songsList[indexPath.row] lastPathComponent];
+    NSString *filename = [[self.model songsList][indexPath.row] lastPathComponent];
     
     cell.textLabel.text = [filename substringToIndex:[filename length] - 4];
     
-    if (indexPath.row == currentSongIndex) {
+    if (indexPath.row == [AKSAudioPlayerModel currentSongIndex]) {
         cell.backgroundColor = [UIColor colorWithRed:(94 / 255.0) green:(112 /255.0) blue:(141 / 255.0) alpha:1.0];
         cell.textLabel.textColor = [UIColor colorWithRed:(102 / 255.0) green:(255 /255.0) blue:(204 / 255.0) alpha:1.0];
     } else {
-        cell.backgroundColor = [UIColor colorWithRed:(163 / 255.0) green:(174 /255.0) blue:(190 / 255.0) alpha:1.0];
+        cell.backgroundColor = [UIColor colorWithRed:(67 / 255.0) green:(94 /255.0) blue:(135 / 255.0) alpha:1.0];
         cell.textLabel.textColor = [UIColor whiteColor];
     }
     
@@ -111,20 +100,19 @@ static NSInteger currentSongIndex;
 #pragma mark - Audio Player Actions
 
 - (void)configAudioPlayer:(NSInteger)songIndex {
-    
     if (self.audioPlayer) {
         [self.audioPlayer stop];
         self.audioPlayer = nil;
         self.audioPlayer.delegate = nil;
     }
     
-    self.audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:self.songsList[songIndex] error:nil];
+    self.audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:[self.model songsList][songIndex] error:nil];
     
     self.audioPlayer.delegate = self;
     
     [self.audioPlayer prepareToPlay];
     
-    self.durationLabel.text = [self formattedTimeForValue:self.audioPlayer.duration];
+    self.durationLabel.text = [self.model formattedTimeForValue:self.audioPlayer.duration];
     
     self.musicSoundSlider.minimumValue = 0;
     self.musicSoundSlider.maximumValue = self.audioPlayer.duration;
@@ -148,7 +136,7 @@ static NSInteger currentSongIndex;
 }
 
 - (IBAction)musicSoundSliderValueChanged:(UISlider *)sender {
-    self.timePassedLabel.text = [self formattedTimeForValue:sender.value];
+    self.timePassedLabel.text = [self.model formattedTimeForValue:sender.value];
 }
 
 - (IBAction)musicSoundSliderValueSelected:(UISlider *)sender {
@@ -158,28 +146,28 @@ static NSInteger currentSongIndex;
 
 - (IBAction)prevButtonTapped:(id)sender {
     [self.timer invalidate];
-    currentSongIndex--;
+    [AKSAudioPlayerModel decreaseCurrentSongIndex];
     
-    if (currentSongIndex < 0) {
-        currentSongIndex = self.songsList.count - 1;
+    if ([AKSAudioPlayerModel currentSongIndex] < 0) {
+        [AKSAudioPlayerModel setCurrentSongIndex:[[self.model songsList] count] - 1];
     }
     
-    [self prepareSongPlaying];
+    [self startPlayingSong];
 }
 
 - (IBAction)nextButtonTapped:(UIButton *)sender {
     [self.timer invalidate];
-    currentSongIndex++;
+    [AKSAudioPlayerModel increaseCurrentSongIndex];
     
-    if (currentSongIndex >= self.songsList.count) {
-        currentSongIndex = 0;
+    if ([AKSAudioPlayerModel currentSongIndex] >= [[self.model songsList] count]) {
+        [AKSAudioPlayerModel setCurrentSongIndex:0];
     }
     
-    [self prepareSongPlaying];
+    [self startPlayingSong];
 }
 
 - (void)fireTimeInterval {
-    self.timePassedLabel.text = [self formattedTimeForValue:self.audioPlayer.currentTime];
+    self.timePassedLabel.text = [self.model formattedTimeForValue:self.audioPlayer.currentTime];
     self.musicSoundSlider.value = self.audioPlayer.currentTime;
 }
 
@@ -187,17 +175,16 @@ static NSInteger currentSongIndex;
 #pragma mark - AVAudioPlayerDelegate
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
-    
     [self.timer invalidate];
     [self.audioPlayer stop];
     
-    currentSongIndex++;
+    [AKSAudioPlayerModel increaseCurrentSongIndex];
     
-    if (currentSongIndex >= self.songsList.count) {
-        currentSongIndex = 0;
+    if ([AKSAudioPlayerModel currentSongIndex] >= [[self.model songsList] count]) {
+        [AKSAudioPlayerModel setCurrentSongIndex:0];
     }
     
-    [self prepareSongPlaying];
+    [self startPlayingSong];
 }
 
 - (void)audioPlayerDecodeErrorDidOccur:(AVAudioPlayer *)player error:(NSError *)error {
@@ -205,7 +192,7 @@ static NSInteger currentSongIndex;
     self.playPauseButton.selected = NO;
     self.musicSoundSlider.value = 0;
     self.timePassedLabel.text = @"00:00";
-    currentSongIndex = 0;
+    [AKSAudioPlayerModel setCurrentSongIndex:0];
 }
 
 @end

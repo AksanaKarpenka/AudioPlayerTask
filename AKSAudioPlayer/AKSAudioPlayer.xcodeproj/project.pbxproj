@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		960959291F3B84E400E7EA80 /* AKSAudioPlayerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 960959281F3B84E400E7EA80 /* AKSAudioPlayerModel.m */; };
 		961191361F3B357C00BCA779 /* elena-temnikova-schate-sergey-zakharov-radio-mix.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9611912D1F3B357C00BCA779 /* elena-temnikova-schate-sergey-zakharov-radio-mix.mp3 */; };
 		961191371F3B357C00BCA779 /* evanescence-bring-me-to-life.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9611912E1F3B357C00BCA779 /* evanescence-bring-me-to-life.mp3 */; };
 		961191381F3B357C00BCA779 /* linkin-park-in-the-end.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9611912F1F3B357C00BCA779 /* linkin-park-in-the-end.mp3 */; };
@@ -26,6 +27,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		960959271F3B84E400E7EA80 /* AKSAudioPlayerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKSAudioPlayerModel.h; sourceTree = "<group>"; };
+		960959281F3B84E400E7EA80 /* AKSAudioPlayerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKSAudioPlayerModel.m; sourceTree = "<group>"; };
 		9611912D1F3B357C00BCA779 /* elena-temnikova-schate-sergey-zakharov-radio-mix.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "elena-temnikova-schate-sergey-zakharov-radio-mix.mp3"; sourceTree = "<group>"; };
 		9611912E1F3B357C00BCA779 /* evanescence-bring-me-to-life.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "evanescence-bring-me-to-life.mp3"; sourceTree = "<group>"; };
 		9611912F1F3B357C00BCA779 /* linkin-park-in-the-end.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "linkin-park-in-the-end.mp3"; sourceTree = "<group>"; };
@@ -84,6 +87,8 @@
 				96502F491F39B9AC0010CDC6 /* AppDelegate.m */,
 				96502F4B1F39B9AC0010CDC6 /* ViewController.h */,
 				96502F4C1F39B9AC0010CDC6 /* ViewController.m */,
+				960959271F3B84E400E7EA80 /* AKSAudioPlayerModel.h */,
+				960959281F3B84E400E7EA80 /* AKSAudioPlayerModel.m */,
 				96502F4E1F39B9AC0010CDC6 /* Main.storyboard */,
 				96502F511F39B9AC0010CDC6 /* Assets.xcassets */,
 				96502F531F39B9AC0010CDC6 /* LaunchScreen.storyboard */,
@@ -201,6 +206,7 @@
 				96502F4D1F39B9AC0010CDC6 /* ViewController.m in Sources */,
 				96502F4A1F39B9AC0010CDC6 /* AppDelegate.m in Sources */,
 				96502F471F39B9AC0010CDC6 /* main.m in Sources */,
+				960959291F3B84E400E7EA80 /* AKSAudioPlayerModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
