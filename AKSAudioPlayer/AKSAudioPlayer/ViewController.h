@@ -17,7 +17,7 @@
 @property (nonatomic, strong, readonly) NSTimer *timer;
 @property (nonatomic, strong) AKSAudioPlayerModel *model;
 @property (weak, nonatomic) IBOutlet UITableView *musicSongsTable;
-@property (weak, nonatomic) IBOutlet UILabel *durationLabel;
+@property (weak, nonatomic) IBOutlet UILabel *remainingTimeLabel;
 @property (weak, nonatomic) IBOutlet UILabel *timePassedLabel;
 @property (weak, nonatomic) IBOutlet UISlider *musicSoundSlider;
 @property (weak, nonatomic) IBOutlet UIButton *playPauseButton;

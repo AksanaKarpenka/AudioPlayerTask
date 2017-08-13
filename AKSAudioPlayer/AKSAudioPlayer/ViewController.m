@@ -103,7 +103,6 @@
     if (self.audioPlayer) {
         [self.audioPlayer stop];
         self.audioPlayer = nil;
-        self.audioPlayer.delegate = nil;
     }
     
     self.audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:[self.model songsList][songIndex] error:nil];
@@ -112,10 +111,10 @@
     
     [self.audioPlayer prepareToPlay];
     
-    self.durationLabel.text = [self.model formattedTimeForValue:self.audioPlayer.duration];
+    self.remainingTimeLabel.text = [self.model formattedTimeForValue:(int)self.audioPlayer.duration];
     
     self.musicSoundSlider.minimumValue = 0;
-    self.musicSoundSlider.maximumValue = self.audioPlayer.duration;
+    self.musicSoundSlider.maximumValue = (int)self.audioPlayer.duration;
 }
 
 - (IBAction)playButtonTapped:(id)sender {
@@ -136,19 +135,22 @@
 }
 
 - (IBAction)musicSoundSliderValueChanged:(UISlider *)sender {
+    if ((self.audioPlayer.duration - sender.value) < 0) {
+        NSLog(@"Duration: %f; --- Sender: %f", self.audioPlayer.duration, sender.value);
+    }
     [self.timer invalidate];
     self.timePassedLabel.text = [self.model formattedTimeForValue:sender.value];
-    self.durationLabel.text = [self.model formattedTimeForValue:(self.audioPlayer.duration - sender.value)];
+    self.remainingTimeLabel.text = [self.model formattedTimeForValue:((int)self.audioPlayer.duration - (int)sender.value)];
 }
 
 - (IBAction)musicSoundSliderValueSelected:(UISlider *)sender {
+    self.audioPlayer.currentTime = (int)sender.value;
+    [self fireTimeInterval];
     self.timer = [NSTimer scheduledTimerWithTimeInterval:0.1
                                                   target:self
                                                 selector:@selector(fireTimeInterval)
                                                 userInfo:nil
                                                  repeats:YES];
-    self.audioPlayer.currentTime = sender.value;
-    [self fireTimeInterval];
 }
 
 - (IBAction)prevButtonTapped:(id)sender {
@@ -174,9 +176,9 @@
 }
 
 - (void)fireTimeInterval {
-    self.timePassedLabel.text = [self.model formattedTimeForValue:self.audioPlayer.currentTime];
-    self.durationLabel.text = [self.model formattedTimeForValue:(self.audioPlayer.duration - self.audioPlayer.currentTime)];
-    self.musicSoundSlider.value = self.audioPlayer.currentTime;
+    self.timePassedLabel.text = [self.model formattedTimeForValue:(int)self.audioPlayer.currentTime];
+    self.remainingTimeLabel.text = [self.model formattedTimeForValue:((int)self.audioPlayer.duration - (int)self.audioPlayer.currentTime)];
+    self.musicSoundSlider.value = (int)self.audioPlayer.currentTime;
 }
 
 
@@ -200,7 +202,7 @@
     self.playPauseButton.selected = NO;
     self.musicSoundSlider.value = 0;
     self.timePassedLabel.text = @"00:00";
-    self.durationLabel.text = @"00:00";
+    self.remainingTimeLabel.text = @"00:00";
     [AKSAudioPlayerModel setCurrentSongIndex:0];
 }
 
