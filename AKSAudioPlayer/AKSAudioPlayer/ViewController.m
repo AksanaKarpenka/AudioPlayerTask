@@ -136,10 +136,17 @@
 }
 
 - (IBAction)musicSoundSliderValueChanged:(UISlider *)sender {
+    [self.timer invalidate];
     self.timePassedLabel.text = [self.model formattedTimeForValue:sender.value];
+    self.durationLabel.text = [self.model formattedTimeForValue:(self.audioPlayer.duration - sender.value)];
 }
 
 - (IBAction)musicSoundSliderValueSelected:(UISlider *)sender {
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:0.1
+                                                  target:self
+                                                selector:@selector(fireTimeInterval)
+                                                userInfo:nil
+                                                 repeats:YES];
     self.audioPlayer.currentTime = sender.value;
     [self fireTimeInterval];
 }
@@ -168,6 +175,7 @@
 
 - (void)fireTimeInterval {
     self.timePassedLabel.text = [self.model formattedTimeForValue:self.audioPlayer.currentTime];
+    self.durationLabel.text = [self.model formattedTimeForValue:(self.audioPlayer.duration - self.audioPlayer.currentTime)];
     self.musicSoundSlider.value = self.audioPlayer.currentTime;
 }
 
@@ -192,6 +200,7 @@
     self.playPauseButton.selected = NO;
     self.musicSoundSlider.value = 0;
     self.timePassedLabel.text = @"00:00";
+    self.durationLabel.text = @"00:00";
     [AKSAudioPlayerModel setCurrentSongIndex:0];
 }
 
